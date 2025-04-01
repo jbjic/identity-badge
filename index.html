@@ -148,7 +148,7 @@
 
         .config-section {
             margin-bottom: 20px;
-            padding: 10px;
+            padding: 20px;
             border: 1px solid #ddd;
             border-radius: 8px;
             background: #f9f9f9;
@@ -243,26 +243,23 @@
         <div class="controls">
             <div class="config-section">
                 <h3>全局设置</h3>
-                <button onclick="addBlock('identity')">添加身份块</button>
-                <button onclick="addBlock('affiliation')">添加隶属块</button>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="addBlock('identity')">添加身份块</button>
+                    <button onclick="addBlock('affiliation')">添加隶属块</button>
+                </div>
                 <label for="layoutDirection">布局方向：</label>
                 <select id="layoutDirection" onchange="updateLayout()">
                     <option value="identity-top">身份在上</option>
                     <option value="identity-bottom" selected>身份在下</option>
                 </select>
-            </div>
-
-            <div class="config-section">
                 <h4>网格配置</h4>
-                <div class="grid-config">
-                    <div>
-                        <label for="identityCols">身份区列数：</label>
-                        <input type="number" id="identityCols" min="1" value="1" onchange="updateGrid()">
-                    </div>
-                    <div>
-                        <label for="affiliationCols">隶属区列数：</label>
-                        <input type="number" id="affiliationCols" min="1" value="1" onchange="updateGrid()">
-                    </div>
+                <div class="grid-config" style="display: flex; gap: 10px; align-items: center;">
+                    <label for="identityCols">身份区列数：</label>
+                    <input type="number" id="identityCols" min="1" value="1" onchange="updateGrid()"
+                        style="width: 60px;">
+                    <label for="affiliationCols" style="margin-left: 20px;">隶属区列数：</label>
+                    <input type="number" id="affiliationCols" min="1" value="1" onchange="updateGrid()"
+                        style="width: 60px;">
                 </div>
             </div>
 
@@ -271,29 +268,34 @@
             </div>
             <div class="config-section">
                 <h4>分区标题设置</h4>
-                <div>
-                    <label>
-                        <input type="checkbox" id="toggleIdentityHeader" onchange="toggleSectionHeader('identity')">
-                        显示身份标题
-                    </label>
-                    <input type="text" id="identityHeaderText" value="我是谁" oninput="updateSectionHeader('identity')"
-                        placeholder="身份标题文本">
-                    <input type="color" id="identityHeaderColor" value="#007bff"
-                        onchange="updateSectionHeaderColor('identity')">
-                </div>
-                <div>
-                    <label>
-                        <input type="checkbox" id="toggleAffiliationHeader"
-                            onchange="toggleSectionHeader('affiliation')"> 显示隶属标题
-                    </label>
-                    <input type="text" id="affiliationHeaderText" value="我来自"
-                        oninput="updateSectionHeader('affiliation')" placeholder="隶属标题文本">
-                    <input type="color" id="affiliationHeaderColor" value="#007bff"
-                        onchange="updateSectionHeaderColor('affiliation')">
+                <div style="display: flex; gap: 20px;">
+                    <div>
+                        <label>
+                            <input type="checkbox" id="toggleIdentityHeader" onchange="toggleSectionHeader('identity')">
+                            显示身份标题
+                        </label>
+                        <input type="text" id="identityHeaderText" value="我是谁" oninput="updateSectionHeader('identity')"
+                            placeholder="身份标题文本">
+                        <input type="color" id="identityHeaderColor" value="#007bff"
+                            onchange="updateSectionHeaderColor('identity')">
+                    </div>
+                    <div>
+                        <label>
+                            <input type="checkbox" id="toggleAffiliationHeader"
+                                onchange="toggleSectionHeader('affiliation')"> 显示隶属标题
+                        </label>
+                        <input type="text" id="affiliationHeaderText" value="我来自"
+                            oninput="updateSectionHeader('affiliation')" placeholder="隶属标题文本">
+                        <input type="color" id="affiliationHeaderColor" value="#007bff"
+                            onchange="updateSectionHeaderColor('affiliation')">
+                    </div>
                 </div>
             </div>
             <div class="config-section">
-                <button onclick="exportPDF()">导出PDF</button>
+                <label>
+                    <input type="checkbox" id="singleSideExport"> 仅导出单面
+                </label>
+                <button onclick="exportPDF()" style="background-color: #28a745; color: white;">导出PDF</button>
             </div>
         </div>
     </div>
@@ -316,28 +318,35 @@
             return `
                 <div class="block-config">
                     <h4>${type === 'identity' ? '身份' : '隶属'}块 ${index + 1}</h4>
-                    <input type="file" accept="image/*" onchange="handleAvatarUpload(this, '${type}', ${index})">
-                    <label>
-                        <input type="checkbox" ${block.round ? 'checked' : ''} onchange="toggleAvatarStyle(this, '${type}', ${index})"> 圆形头像
-                    </label>
-                    <label>
-                        <input type="checkbox" ${block.avatarAbove ? 'checked' : ''} onchange="toggleAvatarPosition(this, '${type}', ${index})"> 头像在上方
-                    </label>
-                    <label>
-                        <input type="checkbox" ${block.textCentered ? 'checked' : ''} onchange="toggleTextAlignment(this, '${type}', ${index})"> 文本居中
-                    </label>
-                    <label>
-                        头像大小：
-                        <select onchange="updateAvatarSize(this, '${type}', ${index})">
-                            <option value="40px" ${block.avatarSize === '40px' ? 'selected' : ''}>小</option>
-                            <option value="60px" ${block.avatarSize === '60px' ? 'selected' : ''}>中</option>
-                            <option value="90px" ${block.avatarSize === '90px' ? 'selected' : ''}>大</option>
-                            <option value="140px" ${block.avatarSize === '140px' ? 'selected' : ''}>超大</option>
-                        </select>
-                    </label>
-                    <input type="text" placeholder="主描述" value="${block.main}" oninput="updateBlock('${type}', ${index}, 'main', this.value)">
-                    <input type="text" placeholder="副描述" value="${block.sub}" oninput="updateBlock('${type}', ${index}, 'sub', this.value)">
-                    <button onclick="removeBlock('${type}', ${index})">删除块</button>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="file" accept="image/*" onchange="handleAvatarUpload(this, '${type}', ${index})">
+                        <button onclick="clearAvatar('${type}', ${index})" style="margin-left: 10px; padding: 5px 10px; font-size: 0.9em;">清除头像</button>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <label style="flex: 1;">
+                            <input type="checkbox" ${block.round ? 'checked' : ''} onchange="toggleAvatarStyle(this, '${type}', ${index})"> 圆形头像
+                        </label>
+                        <label style="flex: 1;">
+                            <input type="checkbox" ${block.avatarAbove ? 'checked' : ''} onchange="toggleAvatarPosition(this, '${type}', ${index})"> 头像在上方
+                        </label>
+                        <label style="flex: 1;">
+                            <input type="checkbox" ${block.textCentered ? 'checked' : ''} onchange="toggleTextAlignment(this, '${type}', ${index})"> 文本居中
+                        </label>
+                        <label style="flex: 1;">
+                            头像大小：
+                            <select onchange="updateAvatarSize(this, '${type}', ${index})">
+                                <option value="40px" ${block.avatarSize === '40px' ? 'selected' : ''}>小</option>
+                                <option value="60px" ${block.avatarSize === '60px' ? 'selected' : ''}>中</option>
+                                <option value="90px" ${block.avatarSize === '90px' ? 'selected' : ''}>大</option>
+                                <option value="140px" ${block.avatarSize === '140px' ? 'selected' : ''}>超大</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" placeholder="主描述" value="${block.main}" oninput="updateBlock('${type}', ${index}, 'main', this.value)" style="flex: 1;">
+                        <input type="text" placeholder="副描述" value="${block.sub}" oninput="updateBlock('${type}', ${index}, 'sub', this.value)" style="flex: 1;">
+                    </div>
+                    <button onclick="removeBlock('${type}', ${index})" style="background-color: red; color: white; margin-top: 10px;">删除块</button>
                 </div>
             `;
         }
@@ -413,6 +422,11 @@
             reader.readAsDataURL(input.files[0]);
         }
 
+        function clearAvatar(type, index) {
+            blocks[type][index].avatar = '';
+            updatePreview();
+        }
+
         function toggleAvatarStyle(checkbox, type, index) {
             blocks[type][index].round = checkbox.checked;
             updatePreview();
@@ -475,21 +489,24 @@
                 useCORS: true
             });
 
+            const singleSide = document.getElementById('singleSideExport').checked;
             const pdf = new jspdf.jsPDF({
-                orientation: 'landscape',
+                orientation: singleSide ? 'portrait' : 'landscape',
                 unit: 'cm',
-                format: [15.2, 10.2]
+                format: singleSide ? [7.6, 10.2] : [15.2, 10.2]
             });
 
             const imgData = canvas.toDataURL('image/png');
 
             pdf.addImage(imgData, 'PNG', 0, 0, 7.6, 10.2);
-            pdf.addImage(imgData, 'PNG', 7.6, 0, 7.6, 10.2);
 
-            pdf.setDrawColor(150);
-            pdf.setLineWidth(0.04);
-            pdf.setLineDash([0.08, 0.08], 0);
-            pdf.line(7.6, 0, 7.6, 10.2);
+            if (!singleSide) {
+                pdf.addImage(imgData, 'PNG', 7.6, 0, 7.6, 10.2);
+                pdf.setDrawColor(150);
+                pdf.setLineWidth(0.04);
+                pdf.setLineDash([0.08, 0.08], 0);
+                pdf.line(7.6, 0, 7.6, 10.2);
+            }
 
             pdf.save('badge.pdf');
         }
